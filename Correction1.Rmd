@@ -1,0 +1,393 @@
+---
+title: "Exam Correction"
+author: "SI"
+date: "2025-10-13"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+1) Identify and list data quality issues with this dataset:
+
+-Missing value observed from excel
+-Data with different data types observed from excel/inconsistency spelling 
+
+```{r}
+library(readxl)   
+df <- read_excel("C:\\Users\\KADOSH LTD\\Desktop\\Assignmnet\\DataFileExam.xlsx")
+tail(df)
+df
+```
+```{r}
+str(df)
+```
+```{r}
+summary(df)
+```
+
+
+```{r}
+#Step 1: checking missing values
+colSums(is.na(df))
+```
+
+```{r}
+#Step 2: checking duplicates
+sum(duplicated(df))
+```
+
+```{r}
+# Step 3: Checking the outlier in the age since it is the only one which is numeric: However, it can't be plotted because the Age column is not numeric.
+
+# Check structure type
+str(df$Age)              # we find that is Chr
+
+# Convert it into numeric to make the Boxplot
+df$Age <- as.numeric(df$Age)
+
+# Check after
+str(df$Age)             # Now the structure have been changed 
+
+```
+
+```{r}
+# Plotting the box plot to check the outlier
+boxplot(df$Age, main="Boxplot of Age", ylab="Age")
+```
+```{r}
+unique(df$Sex)
+```
+
+## Common data quality issues might include:
+
+Missing values in Age, Sex, Outcome,... 
+
+Inconsistent spelling (e.g., “male”, “Male”, “M”, "dates")
+
+Wrong or impossible values (e.g.M,..)
+
+Incorrect data types (character instead of numeric or date)
+
+```{r}
+# Harmonize 'Sex' variable: We standardize different text entries for gender (e.g. “Male”, “M”, ..) into “M” or “F” only.
+
+
+df$Sex <- toupper(trimws(df$Sex))   # Remove spaces and make uppercase
+# Recode to M / F / NA
+df$Sex <- ifelse(df$Sex %in% c("MALE", "M", "MAN"), "M",
+          ifelse(df$Sex %in% c("FEMALE", "F", "WOMAN"), "F", NA))
+
+table(df$Sex,useNA = "ifany")     #useNA = "ifany" (checks the missing value in table and show them when they are available.)
+df$Sex
+
+```
+# STEP 4: Clean and Recode Age 
+```{r}
+df$Age
+```
+```{r}
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
+library(stringr)
+
+# 2. Clean Age: keep only numeric years
+df <- df %>%
+  mutate(
+    Age_num = as.numeric(gsub("[^0-9.]", "", Age)),  # remove text like 'yrs', 'months','Adult' etc.
+    Age_num = ifelse(Age_num > 120, NA, Age_num)     # remove unrealistic ages
+  )
+
+df$Age_num
+```
+
+```{r}
+# Replace the missing Age values with the mean 
+df$Age_num <- round(replace(df$Age_num, is.na(df$Age_num), mean(df$Age_num, na.rm = TRUE)))
+df$Age_num
+sum(is.na(df$Age_num))
+
+```
+```{r}
+df
+```
+
+```{r}
+# Create a new column called AgeGroup
+df$AgeGroup <-   ifelse(df$Age_num < 5, "Less than 5 years",
+                 ifelse(df$Age_num >= 5 & df$Age_num <= 14, "5-14 years",
+                 ifelse(df$Age_num >= 15 & df$Age_num <= 24, "15-24 years",
+                 ifelse(df$Age_num >= 25 & df$Age_num <= 49, "25-49 years",
+                 ifelse(df$Age_num >= 50, "50 years and above", NA)))))
+head(df)
+```
+
+4. Perform the statistical analyses required and produce outputs (graphs and tables) for
+briefing of the Minister based on his interest [Please ensure that you save your statistical
+analysis program and document step by step what you have done].
+
+```{r}
+#Our Province is north and south
+
+# Total number of cases
+total_cases <- nrow(df)
+total_cases
+
+# Geographical distribution by Province and District
+#cases_by_district <- table(df$District)
+cases_by_province <- table(df$Province)
+
+#total_cases
+cat("Geographical Distribution by Province\n")
+print(cases_by_province)
+```
+```{r}
+# Geographical distribution by Province
+cases_by_province <- table(df$Province)
+
+# Create a bar plot
+barplot(cases_by_province,
+        main = "Geographical Distribution by Province",  # Title of the plot
+        xlab = "Province",                              # X-axis label
+        ylab = "Number of Cases",                       # Y-axis label
+        col = "skyblue",                                # Bar color
+        border = "white",                               # Border color of bars
+        las = 2)                                        # Rotate x-axis labels if necessary
+
+```
+```{r}
+library(ggplot2)
+
+# Geographical distribution by Province
+cases_by_province <- table(df$Province)
+cases_df <- as.data.frame(cases_by_province)  # Convert table to dataframe for ggplot
+
+# Create a ggplot bar plot
+ggplot(cases_df, aes(x = Var1, y = Freq)) +     # Var1 is Province, Freq is the count
+  geom_bar(stat = "identity", fill = "skyblue", color = "black") +  # Bar color and border
+  labs(title = "Geographical Distribution by Province",           # Plot title
+       x = "Province",                                           # X-axis label
+       y = "Number of Cases") +                                   # Y-axis label
+  theme_minimal() +                                             # Minimal theme for the plot
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))       # Rotate x-axis labels for better readability
+```
+```{r}
+# Geographical distribution by Province
+cases_by_province <- table(df$Province)
+
+# Create a pie chart
+pie(cases_by_province,
+    main = "Geographical Distribution by Province",  # Title
+    col = rainbow(length(cases_by_province)))        # Assign colors
+
+```
+```{r}
+unique(df$Lab_Result)
+```
+
+```{r}
+# recode variable Lab results
+
+df$Lab_Result <- toupper(trimws(df$Lab_Result))   # Remove spaces and make uppercase
+# Recode to P / N / NA
+df$Lab_Result <- ifelse(df$Lab_Result %in% c("POSITIVE"), "P",
+          ifelse(df$Lab_Result %in% c("NEGATIVE"), "N", NA))
+
+table(df$Lab_Result,useNA = "ifany")     #useNA = "ifany" (checks the missing value in table and show them when they are available.)
+```
+```{r}
+Positive <-filter(df,Lab_Result=="P")
+Positive
+tot_Positive <- nrow(Positive)
+tot_Positive
+
+```
+
+
+```{r}
+unique(df$Status)
+```
+
+```{r}
+# recode variable Status
+
+
+df$Status <- toupper(trimws(df$Status))   # Remove spaces and make uppercase
+# Recode to P / N / NA
+df$Status <- ifelse(df$Status %in% c("ALIVE"), "Alive",
+          ifelse(df$Status %in% c("DIED"), "Died", NA))
+
+table(df$Status,useNA = "ifany")     #useNA = "ifany" (checks the missing value in table and show them when they are available.)
+```
+
+
+```{r}
+Positive_died <-filter(df,Lab_Result=="P", Status=="Died")
+Positive_died
+tot_Positive_died <- nrow(Positive_died)
+tot_Positive_died
+```
+
+
+```{r}
+# The number of death and the case fatality rate
+
+cfr <- ((tot_Positive_died/tot_Positive)*100)  
+cfr
+```
+```{r}
+tot_Positive
+Positive
+
+```
+
+
+```{r}
+table_Affected <- table(Positive$AgeGroup)
+table_Affected
+barplot(table_Affected)
+```
+## The most and the less affected age groups with a highlight on the children
+
+```{r}
+# Geographical distribution by Province
+table_Affected <- as.data.frame(table_Affected)  # Convert table to dataframe for ggplot
+
+# Create a ggplot bar plot
+ggplot(table_Affected, aes(x = Var1, y = Freq)) +     # Var1 is Province, Freq is the count
+  geom_bar(stat = "identity", fill = "skyblue", color = "black") +  # Bar color and border
+  labs(title = "Geographical Distribution by Province",           # Plot title
+       x = "Province",                                           # X-axis label
+       y = "Number of Cases") +                                   # Y-axis label
+  theme_minimal() +                                             # Minimal theme for the plot
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))       # Rotate x-axis labels for better readability
+```
+## The gender distribution
+```{r}
+table_Affected_gender <- table(Positive$Sex)
+table_Affected_gender
+barplot(table_Affected_gender)
+```
+# Equality tests
+
+Use Chi-square tests to check if cases differ across categories:
+
+```{r}
+chisq.test(table(Positive$Sex))
+chisq.test(table(Positive$AgeGroup))
+chisq.test(table(Positive$District))
+```
+```{r}
+# Geographical distribution by Province
+distribution_by_district <- table(Positive$District)
+
+# Create a bar plot
+barplot(distribution_by_district,
+        main = "Geographical Distribution by District",  # Title of the plot
+        xlab = "District",                              # X-axis label
+        ylab = "Number of Cases",                       # Y-axis label
+        col = "skyblue",                                # Bar color
+        border = "white",                               # Border color of bars
+        las = 2)    
+```
+```{r}
+Positve
+```
+
+```{r}
+# Convert the 'Date of onset' column to Date format
+Positive$`Date of onset` <- as.Date(Positive$`Date of onset`, format = "%d/%m/%Y")
+
+# Verify the format
+Positive$`Date of onset`
+summary
+```
+```{r}
+library(ggplot2)
+
+ggplot(Positive, aes(x = `Date of onset`)) +
+  geom_histogram(binwidth = 1, fill="steelblue", color="black") +
+  labs(title="Epidemic Curve", x="Date of onset", y="Outcome")
+
+
+```
+
+```{r}
+# Rename the column to remove the space
+names(Positive)[names(Positive) == "Date of onset"] <- "Date_of_onset"
+
+# Now use the renamed column in the plot
+ggplot(Positive, aes(x = Date_of_onset)) +
+  geom_histogram(binwidth = 1, fill="steelblue", color="black") +
+  labs(title="Epidemic Curve", x="Date of onset", y="Outcome")
+
+
+```
+## The epidemic curve (Pending)
+```{r}
+library(ggplot2)
+library(dplyr)
+
+# Assuming 'Positive' is your data frame
+
+# Plot the Epidemic Curve with a smoothed curve (LOESS curve)
+ggplot(Positive, aes(x = `Date of onset`)) +
+  geom_histogram(binwidth = 1, fill="steelblue", color="black") +
+  geom_smooth(method = "loess", aes(group = 1), color = "red", size = 1) +  # Add the smooth line
+  labs(title="Epidemic Curve", x="Date of onset", y="Number of Cases") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+```{r}
+distribution_by_outcome <- filter(Positive, Outcome=="Discharged")
+distribution_by_outcome
+tot_distribut_outcome <- nrow(distribution_by_outcome)
+tot_distribut_outcome
+```
+
+```{r}
+recovery_rate <- ((tot_distribut_outcome/tot_Positive)*100)
+recovery_rate
+```
+```{r}
+Outcome_distr <-filter(Positive,Lab_Result=="P", Status=="Died")
+Positive_died
+tot_Positive_died <- nrow(Positive_died)
+tot_Positive_died
+```
+
+```{r}
+
+Positive$Outcome <- toupper(trimws(Positive$Outcome))   # Remove spaces and make uppercase
+# Recode to  / N / NA
+Positive$Outcome <- ifelse(Positive$Outcome %in% c("DISCHARGED"), "Discharged",
+          ifelse(Positive$Outcome %in% c("ADMITTED"), "Admitted",       
+          ifelse(Positive$Outcome %in% c("DIED"), "Died", NA)))
+
+table(Positive$Outcome,useNA = "ifany") 
+```
+
+
+```{r}
+Positive_Outcome <-table(Positive$Outcome)
+Positive_Outcome
+barplot(Positive_Outcome,
+        
+        col = "skyblue",
+        main = "distribution by outcome",
+        xlab = "Outcome",
+        ylab="Frequency")
+```
+## To Continue
+```{r}
+# assuming RecoveryRate is a percentage
+ggplot(data, aes(x = Outcome)) +
+  geom_bar(aes(y = Count, fill = Outcome), stat = "identity") +
+  geom_line(aes(y = RecoveryRate * max(Count), group = 1), color = "blue", size = 1) +
+  scale_y_continuous(
+    name = "Number of Cases",
+    sec.axis = sec_axis(~./max(data$Count), name = "Recovery Rate (%)")
+  ) +
+  labs(title = "Outcome Distribution and Recovery Rate")
+```
