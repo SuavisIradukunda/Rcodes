@@ -1,0 +1,345 @@
+---
+title: "Class4"
+author: "Suavis IRADUKUNDA"
+date: "2025-10-16"
+output: html_document
+---
+
+# Regression
+
+Regression is a set of methodologies used to analyze the relationship between dependent (outcome variable or response variable) and independent variables (inputs or explanatory variables). Regression can be used to provide an equation for predicting the response from explanatory variables.
+
+## Varieties of regression analysis and their use
+
+- **Simple Linear:** Predicting a quantitative response variable from a quantitative explanatory variable  
+- **Polynomial:** Predicting a quantitative response variable from a quantitative explanatory variable where the relationship is modeled as an nth order polynomial  
+- **Multiple Linear:** Predicting a quantitative from two or more explanatory variables.  
+- **Multilevel:** Predicting a response variable from data that have hierarchical structure  
+- **Multivariate:** Predicting more than one response variable from one or more explanatory variables.  
+- **Logistic:** Predicting a categorical response variable from one or more explanatory variables.  
+- **Poisson:** Predicting a response variable representing counts from one or more variables  
+- **Cox proportional hazards:** Predicting time to event (death, failure, relapse) from one or more explanatory variables.  
+- **Time-series:** Modelling time series data with correlated errors.  
+- **Nonlinear:** Predicting a quantitative response variable from one or more explanatory variables where the form of the models is nonlinear.  
+- **Nonparametric:** Predicting a quantitative response from one or more explanatory variables, where the form of the model is derived from the data and not specified a priori.  
+- **Robust:** Predicting a quantitative response variable from one or more explanatory variables using an approach that is resistant to the effect of influential observations.
+
+## Little explanation on Linear model
+
+- It can be used to predict a continuous variable  
+- It can be expressed as `y = mx + b` where `b` is the y-intercept and `m` is the slope  
+- It can also be written as `y = b0 + b1x`  
+- The errors in the prediction are called residuals  
+- The line of the best fit minimizes the error  
+- The residuals are squared and summed up (Residual Sum of Squares: RSS)  
+- Mean Square Error (MSE), Root Mean Square Error (RMSE)  
+- The fitted model is the model (from a family of models) that is closest to your data.  
+- “All models are wrong, but some are useful.”
+
+## OLS Regression
+
+Regressing the response variable on the predictor variables) the goal: To select
+model parameters ( intercept and slopes) that minimize the difference between
+actual response and the predicted by the model.
+Assumption 
+- 1. Normality: For fixed value of the independent values, the dependent
+variable is normally distributed 
+- 2. Independence: The Yi values are independent of
+each other 
+- 3. Linearity: The dependent variable is linearly related to the
+independent variables 
+- 4. Homoscedasticity: The variance of the dependent variable
+does not vary with the levels of the independent variables.
+Note: If you violate these assumptions, your statistical significance tests, and
+confidence may not be accurate.
+
+# Fitting regression models with lm()
+
+# Simple linear regression
+
+```{r}
+data("women")
+fit <- lm(weight ~ height, data = women)
+summary(fit)
+women$weight
+
+fitted(fit)
+
+residuals(fit)
+
+plot(women$height, women$weight, xlab = "Height (in inches)", ylab = "Weight (in pounds)")
+abline(fit)
+```
+The plot suggests that you might be able to improve on the prediction by using a line
+with one bend. WE can fit the polynomial regression
+
+## Polynomial Regression
+
+```{r}
+fit2 <- lm(weight ~ height + I(height^2), data = women)
+summary(fit2)
+plot(women$height, women$weight, xlab = "Height", ylab = "Weight")
+lines(women$height, fitted(fit2))
+```
+
+## Multiple Linear Regression
+When we have more than one predictor variable, simple linear regression becomes
+multiple linear regression, and the analysis grows more involved.
+
+HW: Find a dataset on which you can fit multiple linear regression and interpret your results.
+
+## Regression Diagnostics
+In this section you want to know if the model you have applied is appropriate. The
+most common approach is to apply the plot() function to the object returned by the
+lm(). This produces four graphs that are useful for evaluating the model fit.
+
+```{r}
+fit <- lm(weight ~ height, data = women)
+par(mfrow = c(2, 2))
+plot(fit)
+
+newfit<-lm(weight~height+I(height^2),data=women[-c(13,15),])
+par(mfrow=c(2,2))
+plot(newfit)
+```
+# Outliers
+The car package also provides a statistical test outliers. the function is
+“outlierTest()”
+
+
+## Corrective Measures
+
+What do you do if you identify problems? They are four approaches to dealing with
+violations of regression assumptions:
+1. Deleting observations ( influentials observation like outliers)
+2. Transforming variables ( transform response like y^(r))
+3. Adding or deleting variables ( sometimes to deal with multicolinearity)
+4. Using another regression approach (Like robust regression, etc…)
+
+#Selecting the best regression model
+
+Shoud you include all variables under study? should you add polynomial or
+interactions terms to improve the fit? you make a decision based on predictive
+accuracy and simple and replicable model.
+HW: Read about variable selection methods
+
+# Exploration of mtcars data
+
+```{r}
+plot(mpg ~ wt, data = mtcars)
+model <- lm(mpg ~ wt, data = mtcars)
+# plot(model)
+abline(model)
+summary(model)
+```
+The results show three blocks Block 1: How the model was built Block 2: Five
+number summary of residuals Block 3: Coefficients and estimates
+These are beta coefficients that minimize the RSS b0=37.285 and b1=-5.345
+y=37.285+(-5.345)x
+interpretation of b: for every unit of independent variable, the dependent variable
+goes down ( Because its negative) 5.345 which are miles per gallon).
+Multiple R-squared is like MSE, measure how good of a fit the model is. R^2 of 1
+indicates a perfect fit with no residual error, 0 indicate the worst possible fit.
+```{r}
+predict(model, newdata = data.frame(wt = 6))
+```
+
+## Simulation in R
+
+Simulation is an important (and big) topic for both statistics and for a variety of
+other areas where there is a need to introduce randomness. Sometimes you want to
+implement a statistical procedure that requires random number generation or
+sample (i.e. Markov chain Monte Carlo, the bootstrap, random forests, bagging) and
+sometimes you want to simulate a system and random number generators can be
+used to model random inputs
+Generation of random numbers
+We can simulate from probability distribution
+dnorm(x, mean = 0, sd = 1, log = FALSE)
+pnorm(q, mean = 0, sd = 1, lower.tail = TRUE, log.p = FALSE)
+qnorm(p, mean = 0, sd = 1, lower.tail = TRUE, log.p = FALSE)
+This gives a normal probability plot, The points in this plot will lie approximately on
+a straight line if the distribution is normal.
+rnorm(n, mean = 0, sd = 1) or rnorm() This generate random number from standard
+normal distribution.
+```{r}
+x <- rnorm(10)
+pnorm(2)
+## [1] 0.9772499
+x <- rnorm(10, 20, 2)
+```
+# Setting the random number seed
+When simulating any random numbers it is essential to set the random number seed.
+Setting the random number seed with set.seed() ensures reproducibility of the
+sequence of random numbers.
+
+```{r}
+set.seed(1)
+rnorm(5)
+```
+
+#Simulaton a linear model
+
+
+```{r}
+## Always set your seed!
+set.seed(20)
+x <- rnorm(100)
+e <- rnorm(100, 0, 2)
+y <- 0.5 - 2 * x + e
+plot(x, y)
+```
+```{r}
+set.seed(1)
+sample(1:10, 4)
+sample(1:10, 4)
+## [1] 2 7 3 6
+## Doesn't have to be numbers
+sample(letters, 5)
+## [1] "r" "s" "a" "u" "w"
+## Do a random permutation
+sample(1:10)
+## [1] 10 6 9 2 1 5 8 4 3 7
+sample(1:10)
+## [1] 5 10 2 8 6 1 4 3 9 7
+## Sample w/replacement
+sample(1:10, replace = TRUE)
+## [1] 3 6 10 10 6 4 4 10 9 7
+```
+# Explore the modelr package.
+## Data Visualization
+
+# Data source:
+# https://en.wikipedia.org/wiki/List_of_countries_by_GDP_(PPP)_per_capita
+
+```{r}
+country <- c("Australia", "Austria", "Belgium","Canada", "Denmark", "Finland","France","Germany",
+"Greece","Ireland","Italy","Japan", "Netherland","New Zealand", "Norway", "Portugal", "Spain",
+"Sweden","Switzerland","UK","USA")
+
+Income.inequality <- c(7.0,4.8,4.6,5.6,4.3,3.7,5.6,5.2,6.2,6.0,6.7,3.4,5.3,6.8,3.9,8.0,5.5,4.0,5.7,7.2,8.6)
+Index.HS <- c(0.07,0.01,-0.23,-0.07,-0.19,-0.43,0.05,-0.06,0.38,0.25,-0.12,-1.26,-0.51,0.29,-0.63,1.18,-0.30,-0.83,-0.46,0.79,2.02)
+GDP_WB <- c(45926,47682,43435,45066,45537,30676,39328,46401,26851,49393,35463,36319,48253,37679,65615,28760,33629,45297,59540,40233,54630)
+
+data.21 <- data.frame(country, Income.inequality, Index.HS, GDP_WB)
+plot(data.21[c("Income.inequality", "Index.HS")])
+```
+```{r}
+Index_inequality.df<-data.21[c("Income.inequality","Index.HS")]
+str(Index_inequality.df)
+## 'data.frame': 21 obs. of 2 variables:
+## $ Income.inequality: num 7 4.8 4.6 5.6 4.3 3.7 5.6 5.2 6.2 6 ...
+## $ Index.HS : num 0.07 0.01 -0.23 -0.07 -0.19 -0.43 0.05 -0.
+
+(country<-data.21[,"country"])
+## [1] "Australia" "Austria" "Belgium" "Canada" "Denmark"
+
+(country.2<-data.21["country"])
+str(country)
+str(country.2)
+plot(Index_inequality.df,pch=20)
+text(Index_inequality.df,labels=country)
+## country
+## 1 Australia
+## 2 Austria
+## 3 Belgium
+## 4 Canada
+## 5 Denmark
+
+```
+```{r}
+plot(Index_inequality.df,pch=20)
+text(Index_inequality.df,labels=country,pos=3)
+```
+```{r}
+plot(Index_inequality.df,pch=20)
+text(Index_inequality.df,labels=country,pos=4)
+```
+```{r}
+plot(Index_inequality.df,pch=20)
+text(Index_inequality.df,labels=country,pos=4,cex=0.8)
+```
+```{r}
+text                                                   
+which(country %in% c("Austria","Denmark","Germany","Netherland"))
+## [1] 2 5 8 13
+text.left<-which(country %in% c("Austria","Denmark","Germany","Netherla
+nd"))
+text.left
+## [1] 2 5 8 13
+text.right<-setdiff(1:nrow(data.21),text.left)
+text.right
+## [1] 1 3 4 6 7 9 10 11 12 14 15 16 17 18 19 20 21
+pos.text<-ifelse(1:nrow(data.21)%in% text.left,2,4)
+plot(Index_inequality.df,pch=20,col="red",xlim=c(3,9),ylim=c(-1.5,2.5))
+text(Index_inequality.df,labels=country,pos=pos.text,cex=0.8)
+```
+```{r}
+which(country %in% "Germany")
+## [1] 8
+text.up<-which(country %in% "Germany")
+text.up
+## [1] 8
+text.left<-setdiff(1:nrow(data.21),c(text.right,text.up))
+text.left
+## [1] 2 5 13
+pos.text<-ifelse(1:nrow(data.21) %in% text.up,3,ifelse(1:nrow(data.21)%in% text.left,2,4))
+plot(Index_inequality.df,pch=20,col="red",xlim=c(3,9),ylim=c(-1.5,2.5),
+ann=FALSE)
+text(Index_inequality.df,labels = country,pos=pos.text,cex=0.8)
+main.title<-"Income inequality vs Index of Health and Social problems"
+x.lab<-"Income inequality (5th Ratio)"
+y.lab<-"Index of Health and Social problems"
+title(main=main.title,xlab=x.lab,ylab=y.lab)
+```
+```{r}
+plot(Index_inequality.df,pch=20,col="red",xlim=c(3,9),ylim=c(-1.5,2.5),
+ann=FALSE)
+text(Index_inequality.df,labels = country,pos=pos.text,cex=0.8)
+main.title<-"Income inequality vs Index of Health and Social problems"
+x.lab<-"Income inequality (5th Ratio)"
+y.lab<-"Index of Health and Social problems"
+title(main=main.title,xlab=x.lab,ylab=y.lab)
+mtext(c("Better","Worse"),side=2,at=c(-1.8,2.8),las=1)
+```
+```{r}
+plot(Index_inequality.df,pch=20,col="red",xlim=c(3,9),ylim=c(-1.5,2.5),
+ann=FALSE)
+text(Index_inequality.df,labels = country,pos=pos.text,cex=0.8)
+main.title<-"Income inequality vs Index of Health and Social problems"
+x.lab<-"Income inequality (5th Ratio)"
+y.lab<-"Index of Health and Social problems"
+title(main=main.title,xlab=x.lab,ylab=y.lab)
+mtext(c("Better","Worse"),side=2,at=c(-1.8,2.8),las=1)
+text(x=5,y=1.5,labels=paste("r=",round(cor(Index_inequality.df[1],Index_inequality.df[2]),digits=2)))
+```
+```{r}
+plot(Index_inequality.df,pch=20,col="red",xlim=c(3,9),ylim=c(-1.5,2.5),
+ann=FALSE)
+text(Index_inequality.df,labels = country,pos=pos.text,cex=0.8)
+main.title<-"Income inequality vs Index of Health and Social problems"
+x.lab<-"Income inequality (5th Ratio)"
+y.lab<-"Index of Health and Social problems"
+title(main=main.title,xlab=x.lab,ylab=y.lab)
+mtext(c("Better","Worse"),side=2,at=c(-1.8,2.8),las=1)
+text(x=5,y=1.5,labels=paste("r=",round(cor(Index_inequality.df[1],Index_inequality.df[2]),digits=2)))
+lm.ineq<-lm(Index.HS~Income.inequality,data=Index_inequality.df)
+abline(lm.ineq$coef,col="blue")
+```
+```{r}
+rm(list=ls(all=TRUE))
+###set.seed(1002)
+n <-30 ## number of observations
+M <- 1 ## number of pathways
+p<-5
+z <- matrix(runif(n * p, 0, 1), nrow=n, ncol=p)
+x <- 3*cos(z[, 1]) + 2*rnorm(n)
+x<-as.matrix(x)
+beta.true <- rep(1,ncol(x))
+## pathway-response function
+hfun1 <- function(zvec) (10*cos(zvec[1]) - 15*(zvec[2])^2+10*exp(-zvec
+[3])*zvec[4]-8*sin(zvec[5])*cos(zvec[3])+20*(zvec[1]*zvec[5]))
+h1 <- apply(z, 1, hfun1) ## only depends on z1,z2,z3,z4,z5
+eps <- rnorm(n)
+y <-x * beta.true + h1+ eps
+```
+
