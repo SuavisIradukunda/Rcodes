@@ -1,0 +1,60 @@
+1️⃣ Probability at a specific trial (PMF)
+
+Example: A die is rolled 8 times. Find the probability that exactly 2 successes occur (with success probability = 0.4).
+```{r}
+# Probability of exactly x successes (PMF)
+x <- 2
+n <- 8
+p <- 0.4
+
+y <- dbinom(x, n, p)
+y
+
+```
+
+2️⃣ Cumulative probability (≤ a given value)
+
+Example: Probability of 5 or fewer successes in 100 trials with p = 0.4.
+```{r}
+# Cumulative probability P(X ≤ 5)
+y <- pbinom(5, size = 100, prob = 0.4)
+y
+
+```
+Quantile (inverse binomial distribution)
+```{r}
+# Quantile function
+y <- qbinom(0.4, size = 5, prob = 0.7)
+y
+
+```
+4️⃣ Generate random samples from a binomial distribution
+
+Example 1:
+Generate 100 observations from 
+𝐵(15,0.4)
+```{r}
+# Random sample from B(15, 0.4)
+B <- rbinom(n = 100, size = 15, prob = 0.4)
+B
+
+```
+Take 90 values from the generated sample y without replacement.
+```{r}
+B <- sample(y, size = 90, replace = FALSE)
+
+```
+6️⃣ Plot frequency distribution of the sample
+```{r}
+# Frequency plot
+plot(table(B),
+     main = "Frequency Distribution of Sample B",
+     xlab = "Number of Successes",
+     ylab = "Frequency")
+
+```
+
+
+
+
+

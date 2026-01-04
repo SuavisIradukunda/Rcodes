@@ -1,0 +1,11 @@
+rExp2 <- function(n, lambda, eta) {
+U <- runif(n) # Uniform(0,1)
+X <- eta- (1 / lambda) * log(U) # Inverse transform
+return(X)
+}
+set.seed(123)
+n <- 100
+lambda <- 2
+eta <- 3
+sample_exp <- rExp2(n, lambda, eta)
+sample_exp

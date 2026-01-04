@@ -1,0 +1,12 @@
+x<-0
+n <- 20
+u<-runif(n)
+for (i in 1:n) {
+  if (u[i] < 0.5) {
+    x[i] <- log(2 * u[i])
+  } else {
+    x[i] <- -log(2 * (1 - u[i]))
+  }
+}
+
+x
