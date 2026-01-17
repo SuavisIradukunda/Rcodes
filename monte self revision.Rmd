@@ -1,0 +1,317 @@
+---
+title: "Monte exercises"
+author: "Amie Marie Flora DUSHIMUMUKIZA"
+date: "2026-01-13"
+output: html_document
+---
+
+```{r}
+set.seed(123)
+n<-10000
+X<-runif(n, 3, 5)
+teta.hat<-2*mean(exp(-2*X))
+teta.hat
+```
+```{r}
+set.seed(123)
+n<-100000
+X<-runif(n, 3, 5)
+teta.hat<-2*mean(exp(-2*X))
+teta.hat
+```
+```{r}
+set.seed(123)
+n<-1000000
+X<-runif(n, 3, 5)
+teta.hat<-2*mean(exp(-2*X))
+teta.hat
+```
+Using changing boundaries and variables
+```{r}
+set.seed(123)
+n<-10000
+y<-runif(n, 0, 1)
+teta<-2*mean(exp(-2*(3+2*y)))
+teta
+```
+```{r}
+set.seed(123)
+n<-100000
+y<-runif(n, 0, 1)
+teta<-2*mean(exp(-2*(3+2*y)))
+teta
+```
+```{r}
+set.seed(123)
+n<-1000000
+y<-runif(n, 0, 1)
+teta<-2*mean(exp(-2*(3+2*y)))
+teta
+```
+```{r}
+set.seed(123)
+n<-10000
+t<-runif(n, 2, 5)
+tetaa<-3*mean(t^2)
+tetaa
+```
+```{r}
+set.seed(123)
+n<-100000
+t<-runif(n, 2, 5)
+tetaa<-3*mean(t^2)
+tetaa
+```
+```{r}
+set.seed(123)
+n<-1000000
+t<-runif(n, 2, 5)
+tetaa<-3*mean(t^2)
+tetaa
+```
+```{r}
+set.seed(123)
+m<-10000
+y<-runif(m, 0, 1)
+tet<-3*mean((2+3*y)^2)
+tet
+```
+```{r}
+set.seed(123)
+m<-100000
+y<-runif(m, 0, 1)
+tet<-3*mean((2+3*y)^2)
+tet
+```
+```{r}
+set.seed(123)
+m<-1000000
+y<-runif(m, 0, 1)
+tet<-3*mean((2+3*y)^2)
+tet
+```
+Exercises correction
+6.1 Compute a Monte Carlo estimate of integration of sint dt in the interval[0,pi/3] and compare your estimate with the exact value of the integral.
+```{r}
+set.seed(123)
+n<- 10000
+t<-runif(n, 0, pi/3)
+theta.hat<-(pi/3)*mean(sin(t))
+print(theta.hat)
+print(cos(0)-cos(pi/3))
+```
+```{r}
+set.seed(123)
+n<- 100000
+t<-runif(n, 0, pi/3)
+theta.hat<-(pi/3)*mean(sin(t))
+print(theta.hat)
+```
+```{r}
+set.seed(123)
+n<- 1000000
+t<-runif(n, 0, pi/3)
+theta.hat<-(pi/3)*mean(sin(t))
+print(theta.hat)
+```
+6.2) Refer to Example 6.3. Compute a Monte Carlo estimate of the standard normal cdf, by generating from the Uniform(0,x) distribution. Compare your estimates with the normal cdf function pnorm. Compute an estimate of the variance of your Monte Carlo estimate of Φ(2), and a 95%
+confidence interval for Φ(2).
+
+# codes of exact integral not changing the variable
+```{r}
+set.seed(123)
+n<-10000
+X<-2
+t<-runif(n, 0, X)
+phi.hat2<-0.5 + X*mean(exp(-t^2/2)/sqrt(2*pi))
+print(phi.hat2)
+
+```
+```{r}
+# to find Exact nbr
+set.seed(123)
+x <- 2
+Phi_exact <- pnorm(x)   # exact value
+Phi_exact
+
+```
+# codes when changing the variable
+```{r}
+set.seed(123)
+n<-10000
+X<-2
+y<-runif(n, 0, 1)
+ph.hat2<-0.5 + 2*mean(exp(-2*y^2)/sqrt(2*pi))
+print(ph.hat2)
+exact_p<-pnorm(2)
+print(exact_p)
+```
+# To Compute an estimate of the variance of your Monte Carlo estimate of Φ(2), and a 95% confidence interval for Φ(2).
+
+#finding variance
+```{r}
+set.seed(123)
+n<-10000
+x<-2
+u<-runif(n, 0, x)
+phi_u<-(1/sqrt(2*pi))*exp(-u^2/2)
+phi_hat<-0.5+ 2*mean(phi_u)
+var_hat<-4*var(phi_u)/n
+print(phi_hat)
+print(var_hat)
+print(pnorm(2))
+```
+# finding variance by changing variable
+```{r}
+set.seed(123)
+n <- 10000
+y <- runif(n, 0, 1)
+x <- 2
+phiu <- (1/sqrt(2*pi)) * exp(-(x*y)^2 / 2)  # CORRECT
+phiu_hat <- 0.5 + x * mean(phiu)           # multiply by x = 2
+var_at <- x^2 * var(phiu)/n                # variance formula
+
+print(phiu_hat)
+print(var_at)
+print(pnorm(2))
+
+```
+# confidence interval
+```{r}
+CI <- phi_hat + c(-1,1) * 1.96 * sqrt(var_hat)
+print(CI)
+
+```
+# using estimated monte carlo to estimate variance
+```{r}
+set.seed(123)
+
+n <- 10000
+x <- 2
+
+# Step 1: generate uniform samples
+U <- runif(n, 0, x)
+
+# Step 2: compute per-sample contributions
+Phi_i <- 0.5 + x * ((1/sqrt(2*pi)) * exp(-U^2 / 2))
+
+# Step 3: Monte Carlo estimate (mean)
+Phi_hat <- mean(Phi_i)
+
+# Step 4: Monte Carlo variance using deviations from the estimate
+Var_MC_estimate <- sum((Phi_i - Phi_hat)^2) / (n - 1)
+
+# Step 5: 95% confidence interval
+CI <- Phi_hat + c(-1,1) * 1.96 * sqrt(Var_MC_estimate / n)
+
+cat("MC estimate:", Phi_hat, "\n")
+cat("MC variance estimate:", Var_MC_estimate / n, "\n")
+cat("95% CI:", CI, "\n")
+cat("Exact (pnorm):", pnorm(x), "\n")
+
+```
+
+6.3. Compute a Monte Carlo estimate ˆθ of
+θ =Z 0.50e−xdx
+by sampling from Uniform(0, 0.5), and estimate the variance of ˆθ. Find
+another Monte Carlo estimator θ
+∗ by sampling from the exponential
+distribution. Which of the variances (of ˆθ and ˆθ
+∗
+) is smaller, and why?
+```{r}
+set.seed(123)
+n<- 10000
+x<- runif(n, 0, 0.5)
+teta.hat<- 0.5*mean(exp(-x))
+print(teta.hat)
+exact_v<- (1-exp(-0.5))
+print(exact_v)
+```
+# To estimate the value of variance of teta.hat
+
+```{r}
+set.seed(123)
+n <- 10000
+
+# Uniform(0, 0.5)
+U <- runif(n, 0, 0.5)
+
+# Monte Carlo estimator
+theta_hat <- 0.5 * mean(exp(-U))
+
+# Variance estimate
+Var_theta_hat <- 0.5^2 * var(exp(-U)) / n
+
+theta_hat
+Var_theta_hat
+
+```
+
+```{r}
+set.seed(123)
+n <- 10000
+
+# Uniform-based estimator
+U <- runif(n, 0, 0.5)
+theta_hat <- 0.5 * mean(exp(-U))
+var_theta_hat <- 0.25 * var(exp(-U)) / n
+
+# Exponential-based estimator
+X <- rexp(n, rate=1)
+theta_star <- mean(X <= 0.5)
+var_theta_star <- theta_star * (1 - theta_star) / n
+
+theta_exact <- 1 - exp(-0.5)
+c(theta_hat=theta_hat, theta_star=theta_star, exact=theta_exact)
+c(var_theta_hat=var_theta_hat, var_theta_star=var_theta_star)
+
+```
+Which variance is smaller, and why?
+
+Numerically, Var teta is much smaller than var teta star(bernouilli). Intuition: averaging a smooth function e^-u over a uniform reduces variance more than an indicator, which is high-variance by nature. The uniform estimator leverages the integrand’s smoothness; the indicator throws away information.
+
+6.4 Write a function to compute a Monte Carlo estimate of the Beta(3,
+3) cdf, and use the function to estimate F(x) for x = 0.1, 0.2, . . . , 0.9.
+Compare the estimates with the values returned by the pbeta function
+in R.
+
+```{r}
+set.seed(123)
+n <- 10000
+Y <- rbeta(n, 3, 3)
+
+mc_beta_cdf <- function(x, Y) mean(Y <= x)
+
+xs <- seq(0.1, 0.9, by=0.1)
+mc_est <- sapply(xs, mc_beta_cdf, Y=Y)
+exact <- pbeta(xs, 3, 3)
+
+data.frame(x=xs, mc_est=mc_est, exact=exact, abs_error=abs(mc_est - exact))
+```
+6.14
+```{r}
+set.seed(123)
+
+n <- 100000      # increase n for stability
+mu <- 2          # proposal mean
+
+# Sample from proposal distribution g ~ N(mu, 1)
+X <- rnorm(n, mean = mu, sd = 1)
+
+# importance weights
+w <- exp(-mu * X + mu^2 / 2)
+
+# Importance sampling estimator
+I_hat <- mean(X^2 * (X >= 1) * w)
+
+I_hat
+
+# Exact value
+exact_value <- (1 - pnorm(1)) + dnorm(1)
+exact_value
+
+```
+
+
+

@@ -1,0 +1,212 @@
+---
+title: "project"
+author: "Gisele UWIBEREYEHO"
+date: "2026-01-14"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Question1
+
+```{r}
+m<-10^2
+t<-runif(m,0,pi/3)
+g<-sin(t)
+teta<-(pi/3)*mean(g)
+teta
+```
+
+
+```{r}
+# Method 2. Changing variables and boundaries using uniform(0,1)
+
+set.seed(123)
+n<-10^4
+y<-runif(n,0,1)
+g<-(pi/3)*sin ((pi/3)*y)
+Theta<-mean(g)
+Theta
+
+```
+
+
+Question2 
+```{r}
+m<-10^4
+x<-2
+y<-runif(m,0,1)
+g<- exp(-x^2*y^2/2)
+thi<- 0.5+ x*mean(g/sqrt(2*pi))
+thi
+
+```
+
+
+```{r}
+m<-10^4
+x<-2
+g<- exp(-x^2*y^2/2)
+thi<- 0.5+ x*mean(g/sqrt(2*pi))
+variance<-mean((g-mean(g))^2)/m
+variance
+```
+```{r}
+
+```
+
+
+```{r}
+pnorm(2)
+```
+```{r}
+n<-10000
+X<-2
+y<-runif(n, 0, 1)
+ph.hat2<-0.5 + 2*mean(exp(-2*y^2)/sqrt(2*pi))
+ph.hat2
+```
+Question 3
+
+```{r}
+n<-10^4
+u<-runif(n,0,0.5)
+g<-exp(-u)
+teta<-0.5* mean(g)
+teta
+```
+to compute the variance
+
+```{r}
+# Variance estimate
+n<-10^4
+u<-runif(n,0,0.5)
+g<-exp(-u)
+teta<-0.5* mean(g)
+teta
+Var_theta_hat <- mean((g-mean(g))^2) / n
+Var_theta_hat
+```
+
+
+Question 4 
+```{r}
+# Define x values
+x <- seq(0.1, 0.9, by = 0.1)
+
+# Number of simulations
+n <- 10^5
+
+# Generate Beta(3,3) random numbers
+y <- rbeta(n, 3, 3)
+y
+# Monte Carlo estimates of CDF
+mc_values <- numeric(length(x))
+for (i in 1:length(x)) {
+  mc_values[i] <- sum(y <= x[i]) / n
+}
+
+# Exact CDF using pbeta
+exact_values <- pbeta(x, 3, 3)
+```
+
+
+```{r}
+mc_values
+```
+
+```{r}
+exact_values <- pbeta(x, 3, 3)
+exact_values 
+```
+
+Question5
+
+```{r}
+set.seed(123)
+
+m <- 10^4
+B <- 1000
+x <- 1
+a <- -4
+M <- 1 / sqrt(2*pi)
+
+# Sample mean estimator
+phi_sm <- replicate(B, {
+  Z <- rnorm(m)
+  mean(Z <= x)
+})
+
+# Hit-or-miss estimator
+phi_hm <- replicate(B, {
+  T <- runif(m, a, x)
+  U <- runif(m, 0, M)
+  (x - a) * M * mean(U <= dnorm(T))
+})
+
+var_sm <- var(phi_sm)
+var_hm <- var(phi_hm)
+
+relative_efficiency <- var_hm / var_sm
+
+c(var_sm = var_sm,
+  var_hm = var_hm,
+  relative_efficiency = relative_efficiency)
+```
+
+# Question 6.5
+
+```{r}
+set.seed(123)
+
+# Parameters
+x <- 1.0       # Point to evaluate CDF
+m <- 10000     # Number of Monte Carlo samples
+
+# -------------------------------
+# Method 1: Sample mean Monte Carlo
+# -------------------------------
+Z <- rnorm(m)             # generate standard normal samples
+phi_mean <- mean(Z <= x)  # sample mean estimate
+var_mean <- phi_mean * (1 - phi_mean) / m   # variance of estimator
+
+# -------------------------------
+# Method 2: Hit-or-miss method
+# -------------------------------
+# rectangle: X ~ Uniform(a,x), Y ~ Uniform(0,fmax)
+fmax <- 1 / sqrt(2*pi)
+X <- runif(m, min=-5, max=x)  # take -5 as practical -infinity
+Y <- runif(m, min=0, max=fmax)
+hits <- Y <= dnorm(X)
+phi_hit <- mean(hits) * (x + 5) * fmax  # scale by area of rectangle
+var_hit <- var(hits * (x + 5) * fmax) / m
+
+# -------------------------------
+# Efficiency
+# -------------------------------
+efficiency <- var_hit / var_mean
+
+# -------------------------------
+# Results
+# -------------------------------
+cat("Sample mean estimate:", phi_mean, "\n")
+cat("Hit-or-miss estimate:", phi_hit, "\n")
+cat("Variance of sample mean:", var_mean, "\n")
+cat("Variance of hit-or-miss:", var_hit, "\n")
+cat("Empirical efficiency:", efficiency, "\n")
+```
+
+
+```{r}
+```
+
+
+```{r}
+```
+
+
+```{r}
+```
+

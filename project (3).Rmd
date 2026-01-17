@@ -1,0 +1,404 @@
+---
+title: "project"
+author: "Gisele UWIBEREYEHO"
+date: "2026-01-14"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Question1
+
+```{r cars}
+m<-10^4
+t<-runif(m,0,pi/3)
+g<-sin(t)
+teta<-(pi/3)*mean(g)
+teta
+
+```
+
+
+Question2 
+```{r}
+m<-10^4
+x<-2
+y<-runif(m,0,1)
+g<- exp(-x^2*y^2/2)
+thi<- 0.5+ x*mean(g/sqrt(2*pi))
+thi
+```
+
+
+```{r}
+m<-10^4
+x<-2
+g<- exp(-x^2*y^2/2)
+thi<- 0.5+ x*mean(g/sqrt(2*pi))
+variance<-mean((g-mean(g))^2)/m
+variance
+```
+```{r}
+
+```
+
+
+```{r}
+pnorm(2)
+```
+```{r}
+n<-10000
+X<-2
+y<-runif(n, 0, 1)
+ph.hat2<-0.5 + 2*mean(exp(-2*y^2)/sqrt(2*pi))
+ph.hat2
+```
+Question 3
+
+```{r}
+n<-10^4
+u<-runif(n,0,0.5)
+g<-exp(-u)
+teta<-0.5* mean(g)
+teta
+```
+to compute the variance
+
+```{r}
+# Variance estimate
+n<-10^4
+u<-runif(n,0,0.5)
+g<-exp(-u)
+teta<-0.5* mean(g)
+teta
+Var_theta_hat <- mean((g-mean(g))^2) / n
+Var_theta_hat
+```
+
+
+Question 4 
+```{r}
+# Define x values
+x <- seq(0.1, 0.9, by = 0.1)
+
+# Number of simulations
+n <- 10^5
+
+# Generate Beta(3,3) random numbers
+y <- rbeta(n, 3, 3)
+# Monte Carlo estimates of CDF
+mc_values <- numeric(length(x))
+for (i in 1:length(x)) {
+  mc_values[i] <- sum(y <= x[i]) / n
+}
+
+# Exact CDF using pbeta
+exact_values <- pbeta(x, 3, 3)
+head(y)
+```
+
+
+```{r}
+mc_values
+```
+
+```{r}
+exact_values <- pbeta(x, 3, 3)
+exact_values 
+```
+
+Question5
+
+```{r}
+set.seed(123)
+
+m <- 10^4
+B <- 1000
+x <- 1
+a <- -4
+M <- 1 / sqrt(2*pi)
+
+# Sample mean estimator
+phi_sm <- replicate(B, {
+  Z <- rnorm(m)
+  mean(Z <= x)
+})
+
+# Hit-or-miss estimator
+phi_hm <- replicate(B, {
+  T <- runif(m, a, x)
+  U <- runif(m, 0, M)
+  (x - a) * M * mean(U <= dnorm(T))
+})
+
+var_sm <- var(phi_sm)
+var_hm <- var(phi_hm)
+
+relative_efficiency <- var_hm / var_sm
+
+c(var_sm = var_sm,
+  var_hm = var_hm,
+  relative_efficiency = relative_efficiency)
+
+```
+
+```{r}
+set.seed(123)
+
+# Parameters
+x <- 1      
+m <- 10000     # Number of Monte Carlo samples
+
+# -------------------------------
+# Method 1: Sample mean Monte Carlo
+# -------------------------------
+Z <- rnorm(m)             
+phi_mean <- mean(Z <= x)  
+var_mean <- phi_mean * (1 - phi_mean) / m   
+
+# -------------------------------
+# Method 2: Hit-or-miss method
+# -------------------------------
+# rectangle: X ~ Uniform(a,x), Y ~ Uniform(0,fmax)
+fmax <- 1 / sqrt(2*pi)
+X <- runif(m, min=-5, max=x)  # take -5 as practical -infinity
+Y <- runif(m, min=0, max=fmax)
+hits <- Y <= dnorm(X)
+phi_hit <- mean(hits) * (x + 5) * fmax  # scale by area of rectangle
+var_hit <- var(hits * (x + 5) * fmax) / m
+
+
+
+efficiency <- var_hit / var_mean
+efficiency
+```
+
+
+QUESTION OF PROJECT 
+
+a) it follows the normal distribution
+
+```{r}
+data1<-c(6.89, 10.35, 14.5, 15.35, 13.4, 12.35, 13.6, 11.3, 4.6, 15.85, 10.15, 8.15, 8.25,
+17.05, 15.2, 16.2, 15.05, 16.25, 18.5, 16.8, 15.25, 12.75, 12.45, 10.2, 13.3, 8.7,
+13.05, 10.9, 13, 13.85, 11.55, 14.5, 12.85, 17.15, 13.3, 15.25, 17.55, 11.25, 12.85,
+14.5, 10.7, 11.9, 14, 14.6, 12.4, 15.35, 12.3, 11.7, 11.7, 10, 11.8, 15.6,
+8.6, 10, 12.5, 9.9, 10.3, 13.3, 14, 16.5, 14, 14.7, 18.2, 15.1, 14.4,
+8.1, 12.4, 10.9, 13.1, 14.5, 15.4, 10, 13.2, 13.4, 14.6, 17.5, 13.4, 15.8,
+13.2, 13.3, 13.8, 11.2, 15.3, 16.1, 9.3, 16.5, 11.5, 13, 14.7, 9.3, 8.6,
+12.4, 12.8, 10.8, 5.5, 13.5, 12.4, 11.8, 12.2, 8.5, 9.4, 11.9, 8.6, 13.2,
+12.4, 11.5, 10.1, 14.8, 12.7, 6.1, 8.6, 9.3, 9.9, 8.4, 11.3, 13.1, 13.5,
+4.1, 7.5, 13.9, 15.1, 13.2, 14.5, 17.6, 14.7, 12.5, 15.4, 15.5, 9.2, 10.5,
+13.45, 18.15, 10.9, 12.65, 13.2, 17.6, 13.9, 12.4, 14.6, 12.4, 17.15, 16.4, 13.75,
+14.4, 17.35, 14.3, 14.65, 16.1, 11.25, 10.35, 13.95, 12.55, 7.6, 14.95, 9.6, 18.35,
+12.2, 12.35, 16.7, 15.3, 9, 14.05, 14.65, 11.15, 17.45, 4.75, 13.6, 14.4, 15.2,
+8.75, 13.4, 13.6, 14.35, 12.65, 14.9, 15.1, 15.45, 16.55, 9.75, 16.9, 14.35, 12.66,
+11.44, 11.47, 12.1, 11.34, 10.88, 8.34, 13.24, 15.59, 14.09, 12.4, 15.84, 12.39, 17.64,
+12.78, 12.78, 15.41, 11.21, 12.56, 10.85, 16.04, 11.1, 13.25, 15.9, 14.5, 12.42, 11,
+10.08, 12.8, 8.18, 15.75, 13.26, 12.61, 13.98, 6.77, 13.85, 12.42, 15.36, 13.24, 13.88,
+17.7, 15.02, 17.22, 16.98, 16.12, 17.66, 17.64, 13.32, 17.14, 11.6, 18.1, 14.13, 14.98,
+16.44, 18.73, 14.82, 16.02, 14.66, 14.48, 12.56, 10.21, 18.72, 19.42, 16.22, 17.07, 15.82,
+15.27)
+length(data1)
+data1
+mean_m<-mean(data1)
+mean_m
+sd_m<-sd(data1)
+sd_m
+hist(data1, probability = TRUE, col = "lightgray", main = "Histogram of student Marks")
+x_vals <- seq(min(data1), max(data1), length = 248)
+
+# Add normal density curve
+lines(x_vals,
+      dnorm(x_vals, mean = mean_m, sd = sd_m),
+      col = "red",
+      lwd = 2)
+```
+b) to generate the random sample
+```{r}
+
+# Sample size
+n <- length(data1)
+
+# Estimated parameters
+mu <- mean(data1)
+sigma <- sd(data1)
+
+# Generate random sample
+X_sim <- rnorm(n, mean = mu, sd = sigma)
+
+head(X_sim)
+
+```
+
+d) to test if it works
+```{r}
+mu <- mean(data1)
+sigma <- sd(data1)
+ks.test(X_sim, "pnorm", mean = mu, sd = sigma)
+```
+
+Question2
+
+```{r}
+data(rock)
+View(rock)
+str(rock)
+```
+
+```{r}
+rmvn.Choleski <-
+function(n, mu, Sigma) {
+# generate n random vectors from MVN(mu, Sigma)
+# dimension is inferred from mu and Sigma
+d <- length(mu)
+Q <- chol(Sigma) 
+Z <- matrix(rnorm(n*d), nrow=n, ncol=d)
+X <- Z %*% Q + matrix(mu, n, d, byrow=TRUE)
+X
+}
+
+mu <- colMeans(rock)
+mu
+Sigma <- cov(rock)
+Sigma
+
+X <- rmvn.Choleski(500, mu, Sigma)
+pairs(X)
+
+```
+QUESTION3
+
+```{r}
+set.seed(123)
+
+n <- 1000
+accepted <- numeric()
+
+while(length(accepted) < 20) {
+  Y <- runif(1, -1, 1)   # proposal
+  U <- runif(1, 0, 1)    # uniform(0,1)
+  
+  if (U <= 1 - Y^2) {
+    accepted <- c(accepted, Y)
+  }
+}
+
+accepted
+
+```
+
+TRANSFORMATION METHOD
+a)
+
+```{r}
+set.seed(123)
+n <- 1000
+
+# Generate Uniform(0,1)
+U <- runif(n)
+
+# Transformation to Exponential(1)
+X <- -log(U)
+
+# Histogram (density scale)
+hist(X, probability = TRUE,
+     col = "lightblue",
+     border = "white",
+     main = "Histogram of Simulated Exponential(1) Data",
+     xlab = "x")
+
+# Create x-values for theoretical density
+x_vals <- seq(0,10,0.1)
+
+# Superimpose exponential density using lines()
+lines(x_vals, dexp(x_vals, rate = 1),
+      col = "red",
+      lwd = 2)
+
+
+```
+b)
+
+```{r}
+n<-1000
+nu <- 8
+U<-runif(n*nu)
+
+# Generate exponential variables in matrix form
+X <- matrix(-log(U), nrow = nu)
+
+# Chi-square transformation
+Y_chi <- 2 * colSums(X)
+
+# Plot
+hist(Y_chi, probability = TRUE,
+     col = "lightblue",
+     main = expression(Chi^2~"(df = 16)"),
+     xlab = "y")
+
+x_vals <- seq(0, max(Y_chi), length.out = 200)
+lines(x_vals, dchisq(x_vals, df = 16), col = "red", lwd = 2)
+
+```
+c)
+
+```{r}
+n<-1000
+alpha<-4
+beta<-1/2
+U<-runif(n*alpha)
+
+# Generate exponential variables in matrix form
+X <- matrix(-log(U), nrow = alpha)
+
+# Chi-square transformation
+Y_Gamma <- beta * colSums(X)
+
+# Plot
+hist(Y_Gamma, probability = TRUE,
+     col = "lightblue",
+     main = expression(Chi^2~"(df = 16)"),
+     xlab = "y")
+
+x_vals <- seq(0, max(Y_Gamma), length.out = 200)
+lines(x_vals, dgamma(x_vals,shape = alpha, scale = beta), col = "red", lwd = 2)
+```
+```{r}
+n<-1000
+alpha<-2
+beta<-2
+a<-2
+b<-2
+U1<-runif(n*a)
+U2<-runif(n*(a+b))
+
+# Generate exponential variables in matrix form
+X1 <- matrix(-log(U), nrow = a)
+X2 <- matrix(-log(U), nrow = a+b)
+
+# Chi-square transformation
+Y_beta <- ( colSums(X1)/ colSums(X2))
+
+# Plot
+hist(Y_beta, probability = TRUE,
+     col = "lightblue",
+     main = expression(Chi^2~"(df = 16)"),
+     xlab = "y")
+
+x_vals <- seq(0,1, length.out = 200)
+lines(x_vals, dbeta(x_vals,shape1 = a, shape2 = b), col = "red", lwd = 2)
+```
+
+```{r}
+n <- 1000
+v <- 2
+X <- matrix(rnorm(n*v), n, v)^2 #matrix of sq. normals
+#sum the squared normal across each row: method 1
+y <- rowSums(X)
+
+
+```
+
