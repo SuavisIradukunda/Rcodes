@@ -1,0 +1,308 @@
+---
+title: "Final Project Statistical Computing"
+author: "Group 5"
+date: "2026-01-16"
+output: html_document
+---
+
+GROUP MEMBERS
+-------------
+1. MASHAMI Pacifique 101406
+2. John Seemore 
+3. HITAYEZU James 101381
+4. Paulin Nkusi 101397
+5. IRADUKUNDA Suavis 101391
+6. ⁠Mylene MANIRAKIZA 101403
+
+libraries.
+
+```{r}
+library(MASS)
+```
+
+
+RE = Var(θ̂₂) / Var(θ̂₁)
+If RE > 1, then θ̂₁ is more efficient.
+
+```{r, error=FALSE}
+
+marks <- c(
+6.89,10.35,14.5,15.35,13.4,12.35,13.6,11.3,4.6,15.85,10.15,8.15,8.25,
+17.05,15.2,16.2,15.05,16.25,18.5,16.8,15.25,12.75,12.45,10.2,13.3,8.7,
+13.05,10.9,13,13.85,11.55,14.5,12.85,17.15,13.3,15.25,17.55,11.25,12.85,
+14.5,10.7,11.9,14,14.6,12.4,15.35,12.3,11.7,11.7,10,11.8,15.6,
+8.6,10,12.5,9.9,10.3,13.3,14,16.5,14,14.7,18.2,15.1,14.4,
+8.1,12.4,10.9,13.1,14.5,15.4,10,13.2,13.4,14.6,17.5,13.4,15.8,
+13.2,13.3,13.8,11.2,15.3,16.1,9.3,16.5,11.5,13,14.7,9.3,8.6,
+12.4,12.8,10.8,5.5,13.5,12.4,11.8,12.2,8.5,9.4,11.9,8.6,13.2,
+12.4,11.5,10.1,14.8,12.7,6.1,8.6,9.3,9.9,8.4,11.3,13.1,13.5,
+4.1,7.5,13.9,15.1,13.2,14.5,17.6,14.7,12.5,15.4,15.5,9.2,10.5,
+13.45,18.15,10.9,12.65,13.2,17.6,13.9,12.4,14.6,12.4,17.15,16.4,13.75,
+14.4,17.35,14.3,14.65,16.1,11.25,10.35,13.95,12.55,7.6,14.95,9.6,18.35,
+12.2,12.35,16.7,15.3,9,14.05,14.65,11.15,17.45,4.75,13.6,14.4,15.2,
+8.75,13.4,13.6,14.35,12.65,14.9,15.1,15.45,16.55,9.75,16.9,14.35,12.66,
+11.44,11.47,12.1,11.34,10.88,8.34,13.24,15.59,14.09,12.4,15.84,12.39,17.64,
+12.78,12.78,15.41,11.21,12.56,10.85,16.04,11.1,13.25,15.9,14.5,12.42,11,
+10.08,12.8,8.18,15.75,13.26,12.61,13.98,6.77,13.85,12.42,15.36,13.24,13.88,
+17.7,15.02,17.22,16.98,16.12,17.66,17.64,13.32,17.14,11.6,18.1,14.13,14.98,
+16.44,18.73,14.82,16.02,14.66,14.48,12.56,10.21,18.72,19.42,16.22,17.07,15.82,
+15.27
+)
+
+```
+
+Exploratory analysis
+X∼N(μ,σ2)
+
+```{r ,error=FALSE}
+summary(marks)
+hist(marks, breaks = 20, probability = TRUE)
+```
+
+Statistical reasoning: 
+
+1.Data are continuous
+2.Values cluster around a central mean
+3.Histogram is approximately symmetric
+4.No strong skewness
+5.According to Rizzo, such data are often modeled by a Normal distribution
+
+Conclusion: X∼N (μ,σ2)
+
+Find the analytical form of the distribution
+Estimate parameters
+
+```{r, error=FALSE}
+mu_hat <- mean(marks)
+sigma_hat <- sd(marks)
+
+mu_hat
+sigma_hat
+
+```
+Analytical density
+f(x)=1/2πσ²^1/2 exp(-(x−μ)2/2σ²)
+
+μ=xˉ,σ=s
+
+```{r, error=FALSE}
+set.seed(123)
+
+n <- length(marks)
+simulated_marks <- rnorm(n, mean = mu_hat, sd = sigma_hat)
+
+```
+
+
+Generate a random sample of the same size
+
+
+```{r, error=FALSE}
+set.seed(123)
+
+n <- length(marks)
+simulated_marks <- rnorm(n, mean = mu_hat, sd = sigma_hat)
+
+```
+
+
+Goodness-of-fit test
+We use Kolmogorov–Smirnov test
+
+```{r, error=FALSE}
+ks.test(marks, "pnorm", mean = mu_hat, sd = sigma_hat)
+
+```
+Interpretation
+
+H₀: Data follow Normal(μ, σ²)
+
+If p-value > 0.05 → do not reject H₀
+
+QUESTION 2
+
+Multivariate normal simulation from rock dataset
+
+μ=E(X)
+
+```{r, error=FALSE}
+data(rock)
+head(rock)
+
+mu_hat <- colMeans(rock)
+mu_hat
+
+```
+Σ=Cov(X)
+```{r}
+Sigma_hat <- cov(rock)
+Sigma_hat
+```
+We assume That X∼Np​(μ,Σ)
+
+where:
+p = number of variables
+μ=μ^
+Σ=Σ^
+
+```{r, error=FALSE}
+
+set.seed(123)
+
+n <- 500
+
+simulated_rock <- mvrnorm(
+  n = n,
+  mu = mu_hat,
+  Sigma = Sigma_hat
+)
+
+```
+
+Convert to data frame and inspect
+```{r}
+simulated_rock <- as.data.frame(simulated_rock)
+head(simulated_rock)
+
+```
+The last six records
+
+```{r}
+tail(simulated_rock)
+```
+
+
+
+QUESTION 3
+
+The Rayleigh distribution with parameter σ>0 has density:
+f(x)=x/σ². e^−x^2/(2σ²),x≥0
+
+Find the cumulative distribution function
+Integrate the density:
+F(x)=∫0<->x t/σ²e−t^2/(2σ²) dt
+
+F(x)=1−e^−x2/(2σ²)
+
+
+Apply inverse transform method:
+Let U∼Uniform(0,1)
+
+Set: U=1−e^−x2/(2σ²)
+
+Solve for X:
+
+X= σ(-2ln(1−U)^1/2
+
+
+Algorithm
+1.Generate U∼U(0,1)
+
+2.Compute X= σ(-2ln(1−U)^1/2
+
+
+```{r, error=FALSE}
+set.seed(123)
+
+n <- 1000
+sigma <- 2
+
+u <- runif(n)
+x <- sigma * sqrt(-2 * log(1 - u))
+
+hist(x, probability = TRUE, breaks = 30,
+     main = "Rayleigh Distribution")
+
+curve((x / sigma^2) * exp(-x^2 / (2 * sigma^2)),
+      from = 0,
+      to = max(x),
+      add = TRUE,
+      col = "red",
+      lwd = 2)
+
+```
+
+
+Accept–Reject Method
+
+Target density
+Consider a triangular distribution on [0,1] (Triangular Distribution)
+
+f(x)= {2x,0≤x≤1 ,  0,otherwise 
+
+Proposal distribution:
+Choose:g(x)=1,0≤x≤1   which is U(0,1)
+We need M such that: f(x)≤Mg(x)
+
+Since 
+max f(x)=2, choose M=2
+
+Accept–Reject rule
+1.Generate X∼U(0,1)
+2. Generate U∼U(0,1)
+3. Accept X if: U<= f(x)/Mg(x)=2x/2= x
+
+```{r, error=FALSE}
+set.seed(123)
+
+n <- 1000
+res <- numeric(n)
+i <- 1
+
+while (i <= n) {
+  x <- runif(1)
+  u <- runif(1)
+  if (u <= x) {
+    res[i] <- x
+    i <- i + 1
+  }
+}
+
+hist(res, probability = TRUE, breaks = 30,
+     main = "Triangular Distribution")
+
+curve(2 * x,
+      from = 0,
+      to = 1,
+      add = TRUE,
+      col = "red",
+      lwd = 2)
+
+```
+
+
+Sum and Mixture Method
+
+(Mixture of Two Normal Distributions)
+
+Define the mixture model
+let x={N(-2,1), with probability 0.4,   N(2,1), with probability 0.6
+
+
+Algorithm
+1. Generate B∼Bernoulli(0.4)
+2. If B=1, generate from N(−2,1)
+3. Otherwise, generate from N(2,1)
+
+```{r}
+set.seed(123)
+
+n <- 1000
+b <- rbinom(n, 1, 0.4)
+
+x <- ifelse(b == 1,
+            rnorm(n, -2, 1),
+            rnorm(n, 2, 1))
+
+hist(x, probability = TRUE, breaks = 40,
+     main = "Mixture of Normals")
+
+
+curve(0.4 * dnorm(x, -2, 1) + 0.6 * dnorm(x, 2, 1),
+      from = min(x),
+      to = max(x),
+      add = TRUE,
+      col = "red",
+      lwd = 2)
+```
+
